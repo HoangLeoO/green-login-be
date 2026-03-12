@@ -1,0 +1,26 @@
+package org.example.greenloginbe.dto;
+
+import lombok.Getter;
+import lombok.Setter;
+
+import java.math.BigDecimal;
+import java.time.Instant;
+import java.time.LocalDate;
+import java.util.List;
+
+@Getter
+@Setter
+public class OrderResponse {
+    private Integer id;
+    private Integer customerId;
+    private String customerName;
+    private Integer userId;
+    private String createdBy;
+    private BigDecimal totalAmount;
+    private String status;
+    private String notes;
+    private LocalDate orderDate;
+    private Instant createdAt;
+    
+    private List<OrderItemResponse> items;
+}
