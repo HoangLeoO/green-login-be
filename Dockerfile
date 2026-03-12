@@ -2,7 +2,10 @@
 FROM eclipse-temurin:21-jdk-alpine AS build
 WORKDIR /app
 COPY . .
-RUN chmod +x ./gradlew
+# Sửa lỗi line ending (CRLF -> LF) của Windows và cấp quyền thực thi
+RUN apk add --no-cache dos2unix && \
+    dos2unix gradlew && \
+    chmod +x gradlew
 RUN ./gradlew build -x test
 
 # Run stage
