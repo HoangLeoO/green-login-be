@@ -13,6 +13,7 @@ CREATE TABLE users (
 -- 2. Bảng Customers (Khách hàng - Nhà hàng/Quán ăn)
 CREATE TABLE customers (
                            id INT AUTO_INCREMENT PRIMARY KEY,
+                           customer_code VARCHAR(50) NOT NULL UNIQUE,
                            name VARCHAR(150) NOT NULL,
                            phone VARCHAR(20) NOT NULL,
                            email VARCHAR(150),
@@ -23,6 +24,7 @@ CREATE TABLE customers (
 );
 
 -- Thêm Foreign Key cho bảng Users liên kết đến Customers
+-- Lưu ý: Thực hiện sau khi cả 2 bảng đã được tạo
 ALTER TABLE users ADD FOREIGN KEY (customer_id) REFERENCES customers(id) ON DELETE SET NULL;
 
 -- 3. Bảng Categories (Nhóm danh mục rau củ)
@@ -35,6 +37,7 @@ CREATE TABLE categories (
 -- 4. Bảng Products (Danh sách Sản phẩm/Rau củ)
 CREATE TABLE products (
                           id INT AUTO_INCREMENT PRIMARY KEY,
+                          sku VARCHAR(50) NOT NULL UNIQUE,
                           category_id INT,
                           name VARCHAR(150) NOT NULL,
                           unit VARCHAR(50) NOT NULL COMMENT 'kg, bó, thùng...',
@@ -49,6 +52,7 @@ CREATE TABLE products (
 -- 5. Bảng Orders (Đơn hàng)
 CREATE TABLE orders (
                         id INT AUTO_INCREMENT PRIMARY KEY,
+                        order_code VARCHAR(50) NOT NULL UNIQUE,
                         customer_id INT NOT NULL,
                         user_id INT NOT NULL,
                         total_amount DECIMAL(15, 2) NOT NULL DEFAULT 0,

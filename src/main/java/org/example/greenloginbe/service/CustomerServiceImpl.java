@@ -3,12 +3,14 @@ package org.example.greenloginbe.service;
 import org.example.greenloginbe.entity.Customer;
 import org.example.greenloginbe.repository.CustomerRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.Instant;
-import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 
 @Service
 public class CustomerServiceImpl implements CustomerService {
@@ -17,8 +19,13 @@ public class CustomerServiceImpl implements CustomerService {
     private CustomerRepository customerRepository;
 
     @Override
-    public List<Customer> getAllCustomers() {
-        return customerRepository.findAll();
+    public Page<Customer> getAllCustomers(Pageable pageable) {
+        return customerRepository.findAll(pageable);
+    }
+
+    @Override
+    public Page<Customer> searchCustomers(String searchTerm, Pageable pageable) {
+        return customerRepository.searchCustomers(searchTerm, pageable);
     }
 
     @Override
@@ -29,6 +36,11 @@ public class CustomerServiceImpl implements CustomerService {
     @Override
     @Transactional
     public Customer createCustomer(Customer customer) {
+        // Tự sinh mã khách hàng nếu chưa có: KH-{6 ký tự random}
+        if (customer.getCustomerCode() == null || customer.getCustomerCode().isBlank()) {
+            String code = "KH-" + UUID.randomUUID().toString().substring(0, 6).toUpperCase();
+            customer.setCustomerCode(code);
+        }
         customer.setCreatedAt(Instant.now());
         customer.setUpdatedAt(Instant.now());
         return customerRepository.save(customer);

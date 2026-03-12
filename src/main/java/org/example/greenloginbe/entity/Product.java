@@ -14,17 +14,25 @@ import org.hibernate.annotations.OnDeleteAction;
 import java.math.BigDecimal;
 import java.time.Instant;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+
 @NoArgsConstructor
 @AllArgsConstructor
 @Getter
 @Setter
 @Entity
+@JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
 @Table(name = "products", schema = "db_green")
 public class Product {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id", nullable = false)
     private Integer id;
+
+    @Size(max = 50)
+    @NotNull
+    @Column(name = "sku", nullable = false, length = 50, unique = true)
+    private String sku;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @OnDelete(action = OnDeleteAction.SET_NULL)

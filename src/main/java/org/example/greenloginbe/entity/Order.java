@@ -25,6 +25,11 @@ public class Order {
     @Column(name = "id", nullable = false)
     private Integer id;
 
+    @Size(max = 50)
+    @NotNull
+    @Column(name = "order_code", nullable = false, length = 50, unique = true)
+    private String orderCode;
+
     @NotNull
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "customer_id", nullable = false)

@@ -12,6 +12,7 @@ import java.util.List;
 @Setter
 public class OrderResponse {
     private Integer id;
+    private String orderCode;
     private Integer customerId;
     private String customerName;
     private Integer userId;

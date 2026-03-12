@@ -23,6 +23,11 @@ public class Customer {
     @Column(name = "id", nullable = false)
     private Integer id;
 
+    @Size(max = 50)
+    @NotNull
+    @Column(name = "customer_code", nullable = false, length = 50, unique = true)
+    private String customerCode;
+
     @Size(max = 150)
     @NotNull
     @Column(name = "name", nullable = false, length = 150)
