@@ -11,6 +11,8 @@ public interface CustomerService {
     Page<Customer> searchCustomers(String searchTerm, Pageable pageable);
     Optional<Customer> getCustomerById(Integer id);
     Customer createCustomer(Customer customer);
+    Customer createPublicCustomer(Customer customer);
+    Customer updateCustomerStatus(Integer id, String status);
     Customer updateCustomer(Integer id, Customer customerDetails);
     void deleteCustomer(Integer id);
 }

@@ -1,0 +1,1 @@
+ALTER TABLE customers ADD COLUMN total_debt DECIMAL(15, 2) DEFAULT 0.00;

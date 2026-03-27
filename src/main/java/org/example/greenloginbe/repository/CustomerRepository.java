@@ -9,6 +9,7 @@ import org.springframework.stereotype.Repository;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
+import java.util.List;
 import java.util.Optional;
 
 @Repository
@@ -20,4 +21,9 @@ public interface CustomerRepository extends JpaRepository<Customer, Integer> {
            "c.phone LIKE CONCAT('%', :search, '%') OR " +
            "LOWER(c.customerCode) LIKE LOWER(CONCAT('%', :search, '%'))")
     Page<Customer> searchCustomers(@Param("search") String search, Pageable pageable);
+    @Query("SELECT c.name as name, SUM(o.totalAmount) as totalSpent, COUNT(o) as orders " +
+           "FROM Customer c JOIN Order o ON o.customer.id = c.id " +
+           "WHERE o.status = 'paid' " +
+           "GROUP BY c.id ORDER BY totalSpent DESC")
+    List<Object[]> getTopCustomers(Pageable pageable);
 }

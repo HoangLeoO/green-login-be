@@ -1,6 +1,7 @@
 package org.example.greenloginbe.controller;
 
 import org.example.greenloginbe.entity.Customer;
+import org.example.greenloginbe.service.CustomerFavoriteService;
 import org.example.greenloginbe.service.CustomerService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -18,6 +19,9 @@ public class CustomerController {
 
     @Autowired
     private CustomerService customerService;
+
+    @Autowired
+    private CustomerFavoriteService customerFavoriteService;
 
     @GetMapping
     public ResponseEntity<Page<Customer>> getAllCustomers(
@@ -67,6 +71,16 @@ public class CustomerController {
         }
     }
 
+    @PatchMapping("/{id}/status")
+    @PreAuthorize("hasRole('ADMIN') or hasRole('STAFF')")
+    public ResponseEntity<Customer> updateCustomerStatus(@PathVariable Integer id, @RequestParam String status) {
+        try {
+            return ResponseEntity.ok(customerService.updateCustomerStatus(id, status));
+        } catch (RuntimeException e) {
+            return ResponseEntity.notFound().build();
+        }
+    }
+
     @DeleteMapping("/{id}")
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<?> deleteCustomer(@PathVariable Integer id) {
@@ -76,5 +90,10 @@ public class CustomerController {
         } catch (RuntimeException e) {
             return ResponseEntity.notFound().build();
         }
+    }
+
+    @GetMapping("/{id}/favorites")
+    public ResponseEntity<?> getCustomerFavorites(@PathVariable Integer id) {
+        return ResponseEntity.ok(customerFavoriteService.getCustomerFavorites(id));
     }
 }

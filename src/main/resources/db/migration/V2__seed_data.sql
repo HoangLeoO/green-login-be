@@ -19,7 +19,17 @@ INSERT INTO products (sku, category_id, name, unit, default_price, stock_quantit
 INSERT INTO customers (customer_code, name, phone, email, address, notes) VALUES
 ('KH-SV-001', 'Nhà hàng Sen Vàng', '0912345678', 'senvang@gmail.com', '123 Đường ABC, Hà Nội', 'Giao hàng trước 8h sáng'),
 ('KH-CB-002', 'Quán cơm Cô Ba', '0987654321', 'coba@gmail.com', '456 Đường XYZ, Hà Nội', 'Thanh toán theo tuần'),
-('KH-ST-003', 'Bún chả Sinh Từ', '0901234567', null, '789 Đường Láng, Hà Nội', null);
+('KH-ST-003', 'Bún chả Sinh Từ', '0901234567', null, '789 Đường Láng, Hà Nội', null),
+('KH-NEW-001', 'Lẩu Phan - Cơ sở mới', '0999888777', 'phan@gmail.com', '99 Cầu Giấy, Hà Nội', 'Đăng ký qua form website');
+
+-- Cập nhật status cho khách hàng đăng ký qua website
+UPDATE customers SET status = 'pending' WHERE customer_code = 'KH-NEW-001';
+
+-- Dữ liệu mẫu cho Customer Branches
+INSERT INTO customer_branches (customer_id, branch_name, phone, address, notes) VALUES
+(1, 'CN Sen Vàng Tây Hồ', '0911111111', '10 Thụy Khuê, Tây Hồ', 'Giao cổng sau'),
+(1, 'CN Sen Vàng Hà Đông', '0922222222', '20 Quang Trung, Hà Đông', null),
+(2, 'Cô Ba Cầu Giấy', '0933333333', '15 Xuân Thủy, Cầu Giấy', null);
 
 -- Dữ liệu mẫu cho Users (Password: password123)
 -- Admin
@@ -30,9 +40,9 @@ INSERT INTO users (username, password_hash, display_name, role) VALUES
 ('staff01', '$2a$10$4v3FMh3e4qQ/IZBSrvjLAOhw6lK/i7/46ozCo/kKCsJPSVHNCkCca', 'Nguyễn Văn Nhân Viên', 'STAFF');
 
 -- Dữ liệu mẫu cho Orders
-INSERT INTO orders (order_code, customer_id, user_id, total_amount, status, notes, order_date) VALUES
-('HD260311-001', 1, 2, 62000, 'paid', 'Đơn hàng giao sớm', '2026-03-11'),
-('HD260312-001', 2, 2, 450000, 'pending', 'Khách nợ', '2026-03-12');
+INSERT INTO orders (order_code, customer_id, branch_id, user_id, total_amount, status, notes, order_date) VALUES
+('HD260311-001', 1, 1, 2, 62000, 'paid', 'Đơn hàng giao sớm', '2026-03-11'),
+('HD260312-001', 2, 3, 2, 450000, 'pending', 'Khách nợ', '2026-03-12');
 
 -- Dữ liệu mẫu cho Order Items
 INSERT INTO order_items (order_id, product_id, quantity, unit_price, total_price) VALUES

@@ -15,6 +15,8 @@ public class OrderResponse {
     private String orderCode;
     private Integer customerId;
     private String customerName;
+    private Integer branchId;
+    private String branchName;
     private Integer userId;
     private String createdBy;
     private BigDecimal totalAmount;
@@ -23,5 +25,6 @@ public class OrderResponse {
     private LocalDate orderDate;
     private Instant createdAt;
     
+    private String customerEmail;
     private List<OrderItemResponse> items;
 }

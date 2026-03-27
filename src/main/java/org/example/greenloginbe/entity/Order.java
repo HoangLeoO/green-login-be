@@ -40,10 +40,19 @@ public class Order {
     @JoinColumn(name = "user_id", nullable = false)
     private User user;
 
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "branch_id")
+    private CustomerBranch branch;
+
     @NotNull
     @ColumnDefault("0.00")
     @Column(name = "total_amount", nullable = false, precision = 15, scale = 2)
     private BigDecimal totalAmount;
+
+    @NotNull
+    @ColumnDefault("0.00")
+    @Column(name = "paid_amount", nullable = false, precision = 15, scale = 2)
+    private BigDecimal paidAmount = BigDecimal.ZERO;
 
     @Size(max = 50)
     @ColumnDefault("'pending'")

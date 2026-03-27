@@ -1,27 +1,33 @@
 package org.example.greenloginbe.controller;
 
+import lombok.extern.slf4j.Slf4j;
+import org.example.greenloginbe.dto.OrderLogResponse;
 import org.example.greenloginbe.dto.OrderRequest;
 import org.example.greenloginbe.dto.OrderResponse;
-import org.example.greenloginbe.dto.OrderLogResponse;
 import org.example.greenloginbe.entity.OrderLog;
+import org.example.greenloginbe.enums.OrderStatus;
 import org.example.greenloginbe.repository.OrderLogRepository;
 import org.example.greenloginbe.service.OrderService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
+import java.util.stream.Collectors;
 
 @CrossOrigin(origins = "*", maxAge = 3600)
 @RestController
 @RequestMapping("/api/orders")
+@Slf4j
 public class OrderController {
 
     @Autowired
@@ -70,7 +76,7 @@ public class OrderController {
 
     @PatchMapping("/{id}/status")
     @PreAuthorize("hasRole('ADMIN') or hasRole('STAFF')")
-    public ResponseEntity<OrderResponse> updateOrderStatus(@PathVariable Integer id, @RequestParam String status) {
+    public ResponseEntity<OrderResponse> updateOrderStatus(@PathVariable Integer id, @RequestParam OrderStatus status) {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         UserDetails userDetails = (UserDetails) authentication.getPrincipal();
 
@@ -81,11 +87,12 @@ public class OrderController {
             return ResponseEntity.notFound().build();
         }
     }
+
     @GetMapping("/{id}/logs")
     @Transactional
-    public ResponseEntity<java.util.List<OrderLogResponse>> getOrderLogs(@PathVariable Integer id) {
-        java.util.List<OrderLog> logs = orderLogRepository.findByOrderIdOrderByCreatedAtDesc(id);
-        java.util.List<OrderLogResponse> response = logs.stream().map(log -> {
+    public ResponseEntity<List<OrderLogResponse>> getOrderLogs(@PathVariable Integer id) {
+        List<OrderLog> logs = orderLogRepository.findByOrderIdOrderByCreatedAtDesc(id);
+        List<OrderLogResponse> response = logs.stream().map(log -> {
             OrderLogResponse dto = new OrderLogResponse();
             dto.setId(log.getId());
             dto.setOrderId(log.getOrder().getId());
@@ -93,15 +100,35 @@ public class OrderController {
             dto.setOldData(log.getOldData());
             dto.setNewData(log.getNewData());
             dto.setCreatedAt(log.getCreatedAt());
-            
+
             if (log.getUser() != null) {
                 dto.setUserId(log.getUser().getId());
                 dto.setUsername(log.getUser().getUsername());
                 dto.setUserFullName(log.getUser().getDisplayName());
             }
             return dto;
-        }).collect(java.util.stream.Collectors.toList());
+        }).collect(Collectors.toList());
 
+        return ResponseEntity.ok(response);
+    }
+    @PostMapping("/{id}/send-invoice")
+    @PreAuthorize("hasRole('ADMIN') or hasRole('STAFF')")
+    public ResponseEntity<?> sendInvoice(@PathVariable("id") Integer id) {
+        try {
+            orderService.sendInvoice(id);
+            return ResponseEntity.ok().body(java.util.Map.of("message", "Invoice email is being sent"));
+        } catch (Exception e) {
+            log.error("Chi tiết lỗi gửi hóa đơn: ", e);
+            return ResponseEntity.badRequest().body(java.util.Map.of("error", e.getMessage() != null ? e.getMessage() : "Internal Server Error"));
+        }
+    }
+
+    @PostMapping("/{id}/copy")
+    @PreAuthorize("hasRole('ADMIN') or hasRole('STAFF')")
+    public ResponseEntity<OrderResponse> copyOrder(@PathVariable Integer id) {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        UserDetails userDetails = (UserDetails) authentication.getPrincipal();
+        OrderResponse response = orderService.copyOrder(id, userDetails.getUsername());
         return ResponseEntity.ok(response);
     }
 }

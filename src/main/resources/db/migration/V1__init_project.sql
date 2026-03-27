@@ -19,8 +19,21 @@ CREATE TABLE customers (
                            email VARCHAR(150),
                            address VARCHAR(255),
                            notes TEXT,
+                           status VARCHAR(20) DEFAULT 'approved' COMMENT 'pending, approved, rejected',
                            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
                            updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+);
+
+-- 2b. Bảng Customer Branches (Các chi nhánh của khách hàng)
+CREATE TABLE customer_branches (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    customer_id INT NOT NULL,
+    branch_name VARCHAR(150) NOT NULL,
+    phone VARCHAR(20),
+    address VARCHAR(255),
+    notes TEXT,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (customer_id) REFERENCES customers(id) ON DELETE CASCADE
 );
 
 -- Thêm Foreign Key cho bảng Users liên kết đến Customers
@@ -54,6 +67,7 @@ CREATE TABLE orders (
                         id INT AUTO_INCREMENT PRIMARY KEY,
                         order_code VARCHAR(50) NOT NULL UNIQUE,
                         customer_id INT NOT NULL,
+                        branch_id INT DEFAULT NULL COMMENT 'Chi nhánh giao hàng',
                         user_id INT NOT NULL,
                         total_amount DECIMAL(15, 2) NOT NULL DEFAULT 0,
                         status VARCHAR(50) DEFAULT 'pending' COMMENT 'pending: chưa thanh toán, paid: đã thanh toán, cancelled: đã huỷ',
@@ -62,6 +76,7 @@ CREATE TABLE orders (
                         created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
                         updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
                         FOREIGN KEY (customer_id) REFERENCES customers(id),
+                        FOREIGN KEY (branch_id) REFERENCES customer_branches(id) ON DELETE SET NULL,
                         FOREIGN KEY (user_id) REFERENCES users(id)
 );
 

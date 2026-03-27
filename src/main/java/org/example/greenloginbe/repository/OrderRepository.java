@@ -8,7 +8,9 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
+import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.util.List;
 
 @Repository
 public interface OrderRepository extends JpaRepository<Order, Integer> {
@@ -27,4 +29,25 @@ public interface OrderRepository extends JpaRepository<Order, Integer> {
             @Param("endDate") LocalDate endDate,
             @Param("search") String search,
             Pageable pageable);
+
+    @Query("SELECT o FROM Order o WHERE o.customer.id = :customerId " +
+           "AND o.status NOT IN ('paid', 'cancelled') " +
+           "ORDER BY o.orderDate ASC, o.id ASC")
+    List<Order> findUnpaidOrders(@Param("customerId") Integer customerId);
+    @Query("SELECT COUNT(o) FROM Order o WHERE o.orderDate = :date")
+    long countOrdersByDate(@Param("date") LocalDate date);
+
+    @Query("SELECT SUM(o.totalAmount) FROM Order o WHERE o.orderDate = :date AND o.status != 'cancelled'")
+    BigDecimal sumRevenueByDate(@Param("date") LocalDate date);
+
+    @Query("SELECT COUNT(o) FROM Order o WHERE o.status IN ('debt', 'partial_paid') AND o.orderDate = :date")
+    long countUnpaidOrdersByDate(@Param("date") LocalDate date);
+
+    @Query("SELECT o FROM Order o WHERE o.orderDate = :today ORDER BY o.id DESC")
+    List<Order> findRecentOrders(@Param("today") LocalDate today, Pageable pageable);
+
+    @Query("SELECT o.orderDate as date, SUM(o.totalAmount) as revenue, COUNT(o) as orderCount " +
+           "FROM Order o WHERE o.orderDate >= :startDate " +
+           "GROUP BY o.orderDate ORDER BY o.orderDate ASC")
+    List<Object[]> getSevenDayStats(@Param("startDate") LocalDate startDate);
 }

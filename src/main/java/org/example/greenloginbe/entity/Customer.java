@@ -10,6 +10,11 @@ import lombok.Setter;
 import org.hibernate.annotations.ColumnDefault;
 
 import java.time.Instant;
+import java.util.ArrayList;
+import java.util.List;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
+import java.math.BigDecimal;
+
 
 @NoArgsConstructor
 @AllArgsConstructor
@@ -49,6 +54,16 @@ public class Customer {
     @Column(name = "notes", columnDefinition = "TEXT")
     private String notes;
 
+    @Size(max = 20)
+    @ColumnDefault("'approved'")
+    @Column(name = "status", length = 20)
+    private String status = "approved";
+
+    @ColumnDefault("0.00")
+    @Column(name = "total_debt", precision = 15, scale = 2)
+    private BigDecimal totalDebt = BigDecimal.ZERO;
+
+
     @ColumnDefault("CURRENT_TIMESTAMP")
     @Column(name = "created_at")
     private Instant createdAt;
@@ -57,5 +72,8 @@ public class Customer {
     @Column(name = "updated_at")
     private Instant updatedAt;
 
+    @OneToMany(mappedBy = "customer", cascade = CascadeType.ALL, orphanRemoval = true)
+    @JsonManagedReference
+    private List<CustomerBranch> branches = new ArrayList<>();
 
 }

@@ -9,6 +9,7 @@ import java.util.List;
 @Setter
 public class OrderRequest {
     private Integer customerId;
+    private Integer branchId;
     private String notes;
     private String orderDate; // format: "yyyy-MM-dd"
     
